@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PGLink Payment - Unified Payment Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: '#f0f9ff',
+                100: '#e0f2fe',
+                200: '#bae6fd',
+                300: '#7dd3fc',
+                400: '#38bdf8',
+                500: '#0ea5e9',
+                600: '#0284c7',
+                700: '#0369a1',
+                800: '#075985',
+                900: '#0c4a6e',
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+      .gradient-text {
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-gradient {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      }
+      .card-gradient {
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      }
+      .float-animation {
+        animation: float 6s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+      .pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.6); }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            <span class="text-xl font-bold">SPayment</span>
+          </div>
+          <div class="hidden md:flex items-center gap-8">
+            <a href="#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
+            <a href="#providers" class="text-slate-300 hover:text-white transition-colors">Providers</a>
+            <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="/admin" class="bg-gradient-to-r from-primary-500 to-indigo-600 hover:from-primary-600 hover:to-indigo-700 text-white px-5 py-2 rounded-xl font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+              Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient min-h-screen flex items-center pt-16 relative overflow-hidden">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-30">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-full px-4 py-1.5 mb-6">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="text-sm text-slate-300">Trusted by 500+ Businesses</span>
+            </div>
+            <h1 class="text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              One Gateway,
+              <span class="gradient-text">Infinite Possibilities</span>
+            </h1>
+            <p class="text-xl text-slate-300 mb-8 max-w-xl">
+              Simplify your payment infrastructure. Accept payments from multiple applications through a single, powerful connection to Xendit and Midtrans.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a href="mailto:hello@imajikode.com" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-indigo-600 hover:from-primary-600 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary-500/25">
+                Getting Started
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+              <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
+                See How It Works
+              </a>
+            </div>
+            <div class="flex items-center gap-6 mt-10">
+              <div class="flex -space-x-3">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=1" class="w-10 h-10 rounded-full border-2 border-slate-900" alt="User" />
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=2" class="w-10 h-10 rounded-full border-2 border-slate-900" alt="User" />
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=3" class="w-10 h-10 rounded-full border-2 border-slate-900" alt="User" />
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=4" class="w-10 h-10 rounded-full border-2 border-slate-900" alt="User" />
+              </div>
+              <div>
+                <div class="flex items-center gap-1">
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                <p class="text-sm text-slate-400 mt-1">4.9/5 from 2,000+ reviews</p>
+              </div>
+            </div>
+          </div>
+          <div class="relative float-animation">
+            <div class="bg-slate-800/50 backdrop-blur-xl rounded-3xl p-1 border border-slate-700 pulse-glow">
+              <div class="bg-slate-900 rounded-3xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                  <span class="text-slate-400 text-sm">Payment Dashboard</span>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                    <span class="text-green-400 text-xs">Live</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                  <div class="bg-slate-800 rounded-xl p-4">
+                    <div class="text-2xl font-bold text-white">$124.5K</div>
+                    <div class="text-xs text-slate-400">Today's Revenue</div>
+                  </div>
+                  <div class="bg-slate-800 rounded-xl p-4">
+                    <div class="text-2xl font-bold text-white">1,847</div>
+                    <div class="text-xs text-slate-400">Transactions</div>
+                  </div>
+                  <div class="bg-slate-800 rounded-xl p-4">
+                    <div class="text-2xl font-bold text-primary-400">98.5%</div>
+                    <div class="text-xs text-slate-400">Success Rate</div>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-white">Bank Transfer</div>
+                        <div class="text-xs text-slate-400">BCA • Success</div>
+                      </div>
+                    </div>
+                    <div class="text-sm font-semibold text-green-400">+Rp 500,000</div>
+                  </div>
+                  <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-white">E-Wallet</div>
+                        <div class="text-xs text-slate-400">OVO • Success</div>
+                      </div>
+                    </div>
+                    <div class="text-sm font-semibold text-green-400">+Rp 250,000</div>
+                  </div>
+                  <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-white">QRIS</div>
+                        <div class="text-xs text-slate-400">QR Code • Pending</div>
+                      </div>
+                    </div>
+                    <div class="text-sm font-semibold text-yellow-400">+Rp 75,000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <span class="inline-block px-4 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-full text-primary-400 text-sm font-medium mb-4">
+            Why Choose PGLink
+          </span>
+          <h2 class="text-4xl font-bold mb-4">
+            Everything You Need to Manage Payments
+          </h2>
+          <p class="text-xl text-slate-400 max-w-2xl mx-auto">
+            Streamline your payment operations with powerful features designed for modern businesses.
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Multi-Application Support</h3>
+            <p class="text-slate-400">
+              Manage unlimited applications under a single payment gateway account. Perfect for businesses with multiple brands or products.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Unified Security</h3>
+            <p class="text-slate-400">
+              Enterprise-grade security with PCI compliance, encrypted transactions, and secure webhook integrations.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Real-Time Analytics</h3>
+            <p class="text-slate-400">
+              Comprehensive dashboards with transaction monitoring, revenue tracking, and detailed reporting.
+            </p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Smart Webhooks</h3>
+            <p class="text-slate-400">
+              Instant payment notifications forwarded to your applications with automatic retry on failures.
+            </p>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Automated Reconciliation</h3>
+            <p class="text-slate-400">
+              Automatic payment matching and reconciliation to keep your financial records accurate and up-to-date.
+            </p>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all group">
+            <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Developer-Friendly API</h3>
+            <p class="text-slate-400">
+              Clean, well-documented RESTful API with SDKs for popular languages and framework integrations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Providers Section -->
+    <section id="providers" class="py-24 bg-slate-800/30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <span class="inline-block px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-4">
+            Payment Providers
+          </span>
+          <h2 class="text-4xl font-bold mb-4">
+            Integrated with Leading Gateways
+          </h2>
+          <p class="text-xl text-slate-400 max-w-2xl mx-auto">
+            Connect to Indonesia's most trusted payment providers with a single integration.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <!-- Xendit -->
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center">
+                <svg class="w-10 h-10" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="24" fill="#0EA5E9"/>
+                  <path d="M24 14C18.477 14 14 18.477 14 24s4.477 10 10 10 10-4.477 10-10S29.523 14 24 14zm0 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="white"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold">Xendit</h3>
+                <p class="text-slate-400">Indonesia's Leading Payment Gateway</p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Bank Transfers (BCA, BRI, BNI, Mandiri, etc.)
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                E-Wallets (OVO, DANA, ShopeePay, etc.)
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Credit/Debit Cards
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                QRIS
+              </div>
+            </div>
+          </div>
+
+          <!-- Midtrans -->
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 hover:border-primary-500/50 transition-all">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
+                <span class="text-white font-bold text-xl">M</span>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold">Midtrans</h3>
+                <p class="text-slate-400">Gojek's Payment Platform</p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Bank Transfers (BCA, BRI, BNI, Mandiri, etc.)
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                E-Wallets (GoPay, ShopeePay, DANA, etc.)
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Credit/Debit Cards
+              </div>
+              <div class="flex items-center gap-3 text-slate-300">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Retail Outlets (Indomaret, Alfamart)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-center text-slate-500 mt-8">
+          Need another provider? <span class="text-primary-400">We're working on adding more.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24 bg-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <span class="inline-block px-4 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-sm font-medium mb-4">
+            How It Works
+          </span>
+          <h2 class="text-4xl font-bold mb-4">
+            Get Started in Three Simple Steps
+          </h2>
+          <p class="text-xl text-slate-400 max-w-2xl mx-auto">
+            From signup to accepting payments in minutes, not days.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="relative">
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 h-full">
+              <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold">
+                1
+              </div>
+              <h3 class="text-xl font-bold mb-3">Create Your Account</h3>
+              <p class="text-slate-400">
+                Sign up for free and connect your Xendit or Midtrans account. We'll handle the integration complexity.
+              </p>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+              <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 h-full">
+              <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold">
+                2
+              </div>
+              <h3 class="text-xl font-bold mb-3">Register Your Apps</h3>
+              <p class="text-slate-400">
+                Add your applications and get unique API keys. Each app can have its own webhook endpoint.
+              </p>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+              <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+
+          <div>
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 h-full">
+              <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold">
+                3
+              </div>
+              <h3 class="text-xl font-bold mb-3">Start Accepting Payments</h3>
+              <p class="text-slate-400">
+                Use our unified API to accept payments from any app. We'll route them through your connected gateway.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-16 bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
+          <h3 class="text-xl font-bold mb-6 text-center">Simple Integration Example</h3>
+          <div class="bg-slate-900 rounded-xl p-6 overflow-x-auto">
+            <pre class="text-sm"><code class="language-javascript"><span class="text-purple-400">const</span> <span class="text-blue-400">response</span> = <span class="text-purple-400">await</span> <span class="text-yellow-400">fetch</span>(<span class="text-green-400">'/payments'</span>, {
+  <span class="text-blue-400">method</span>: <span class="text-green-400">'POST'</span>,
+  <span class="text-blue-400">headers</span>: {
+    <span class="text-green-400">'Content-Type'</span>: <span class="text-green-400">'application/json'</span>,
+    <span class="text-green-400">'X-API-Key'</span>: <span class="text-green-400">'your-app-api-key'</span>
+  },
+  <span class="text-blue-400">body</span>: <span class="text-yellow-400">JSON</span>.<span class="text-blue-400">stringify</span>({
+    <span class="text-blue-400">amount</span>: <span class="text-orange-400">50000</span>,
+    <span class="text-blue-400">provider</span>: <span class="text-green-400">'XENDIT'</span>,
+    <span class="text-blue-400">applicationOrderId</span>: <span class="text-green-400">'ORDER-12345'</span>,
+    <span class="text-blue-400">customerEmail</span>: <span class="text-green-400">'customer@example.com'</span>
+  })
+});
+
+<span class="text-purple-400">const</span> <span class="text-blue-400">payment</span> = <span class="text-purple-400">await</span> response.<span class="text-blue-400">json</span>();
+<span class="text-slate-500">// Payment is created and ready for customer to complete</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- CTA Section -->
+    <section class="py-24 bg-slate-900 relative overflow-hidden">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/30 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/30 rounded-full blur-3xl"></div>
+      </div>
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-4xl font-bold mb-6">
+          Ready to Simplify Your Payments?
+        </h2>
+        <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+          Join hundreds of businesses already using PGLink to manage their payment infrastructure efficiently.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="mailto:hello@imajikode.com" class="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
+            Schedule a Demo
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-slate-500 text-sm">
+            &copy; 2026 PGLink. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<!-- Dialog Container -->
+<div id="dialog-container" class="fixed inset-0 z-50 hidden">
+  <div id="dialog-backdrop" class="dialog-backdrop absolute inset-0"></div>
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <!-- Alert Dialog -->
+    <div id="alert-dialog" class="hidden relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden dialog-enter-active">
+      <div class="p-6">
+        <div class="flex items-start gap-4">
+          <div id="alert-icon" class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"></div>
+          <div class="flex-1">
+            <h3 id="alert-title" class="text-lg font-semibold text-slate-800"></h3>
+            <p id="alert-message" class="mt-2 text-sm text-slate-600"></p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 px-6 py-4 flex justify-end">
+        <button id="alert-ok" class="px-5 py-2.5 rounded-xl font-medium transition-all"></button>
+      </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div id="confirm-dialog" class="hidden relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden dialog-enter-active">
+      <div class="p-6">
+        <div class="flex items-start gap-4">
+          <div id="confirm-icon" class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-amber-100">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 id="confirm-title" class="text-lg font-semibold text-slate-800"></h3>
+            <p id="confirm-message" class="mt-2 text-sm text-slate-600"></p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3">
+        <button id="confirm-cancel" class="px-5 py-2.5 rounded-xl font-medium bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all"></button>
+        <button id="confirm-ok" class="px-5 py-2.5 rounded-xl font-medium transition-all"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>

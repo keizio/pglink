@@ -1,0 +1,791 @@
+<script>
+  const API_BASE = window.location.origin;
+  let jwtToken = localStorage.getItem('admin_token');
+
+  // Dialog Functions
+  const Dialog = {
+    show(type, options) {
+      const container = $('#dialog-container');
+      const backdrop = $('#dialog-backdrop');
+      
+      container.removeClass('hidden');
+      
+      if (type === 'alert') {
+        $('#alert-dialog').removeClass('hidden').addClass('dialog-enter-active');
+        $('#confirm-dialog').addClass('hidden');
+        
+        const icon = $('#alert-icon');
+        const title = $('#alert-title');
+        const message = $('#alert-message');
+        const okBtn = $('#alert-ok');
+        
+        const styles = {
+          success: { bg: 'bg-green-100', text: 'text-green-600', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' },
+          error: { bg: 'bg-red-100', text: 'text-red-600', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>' },
+          warning: { bg: 'bg-amber-100', text: 'text-amber-600', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>' },
+          info: { bg: 'bg-blue-100', text: 'text-blue-600', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' }
+        };
+        
+        const style = styles[options.type] || styles.info;
+        icon.attr('class', `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${style.bg}`);
+        icon.html(`<span class="${style.text}">${style.icon}</span>`);
+        title.text(options.title || 'Notice');
+        message.text(options.message || '');
+        okBtn.text(options.buttonText || 'OK');
+        okBtn.attr('class', `px-5 py-2.5 rounded-xl font-medium transition-all ${options.type === 'error' ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-slate-800 text-white hover:bg-slate-900'}`);
+        
+        okBtn.off('click').on('click', () => this.hide());
+        
+      } else if (type === 'confirm') {
+        $('#confirm-dialog').removeClass('hidden').addClass('dialog-enter-active');
+        $('#alert-dialog').addClass('hidden');
+        
+        const title = $('#confirm-title');
+        const message = $('#confirm-message');
+        const cancelBtn = $('#confirm-cancel');
+        const okBtn = $('#confirm-ok');
+        
+        title.text(options.title || 'Confirm');
+        message.text(options.message || 'Are you sure?');
+        cancelBtn.text(options.cancelText || 'Cancel');
+        okBtn.text(options.confirmText || 'Confirm');
+        
+        okBtn.attr('class', `px-5 py-2.5 rounded-xl font-medium transition-all ${options.danger ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-slate-800 text-white hover:bg-slate-900'}`);
+        
+        cancelBtn.off('click').on('click', () => {
+          this.hide();
+          if (options.onCancel) options.onCancel();
+        });
+        
+        okBtn.off('click').on('click', () => {
+          this.hide();
+          if (options.onConfirm) options.onConfirm();
+        });
+      }
+      
+      backdrop.off('click').on('click', () => this.hide());
+    },
+    
+    hide() {
+      $('#dialog-container').addClass('hidden');
+      $('#alert-dialog').addClass('hidden').removeClass('dialog-enter-active');
+      $('#confirm-dialog').addClass('hidden').removeClass('dialog-enter-active');
+    },
+    
+    alert(options) {
+      return new Promise(resolve => {
+        this.show('alert', {
+          ...options,
+          onOK: resolve
+        });
+      });
+    },
+    
+    confirm(options) {
+      return new Promise(resolve => {
+        this.show('confirm', {
+          ...options,
+          onConfirm: () => resolve(true),
+          onCancel: () => resolve(false)
+        });
+      });
+    }
+  };
+
+  // Page Navigation
+  let currentPage = 'dashboard';
+  let paymentFilters = { page: 1, limit: 10 };
+  let subscriptionFilters = { page: 1, limit: 10 };
+
+  function showLogin() {
+    $('#login-page').removeClass('hidden');
+    $('#dashboard-page').addClass('hidden');
+  }
+
+  function showDashboard() {
+    $('#login-page').addClass('hidden');
+    $('#dashboard-page').removeClass('hidden');
+    loadApplications();
+    loadApplicationsForFilters();
+    loadDashboard();
+  }
+
+  function navigateToPage(page) {
+    currentPage = page;
+    
+    // Update nav tabs
+    $('.nav-tab').each(function() {
+      if ($(this).data('page') === page) {
+        $(this).addClass('bg-slate-800 text-white');
+      } else {
+        $(this).removeClass('bg-slate-800 text-white');
+      }
+    });
+    
+    // Show/hide page headers
+    $('.page-header').each(function() {
+      if ($(this).data('page') === page) {
+        $(this).removeClass('hidden');
+      } else {
+        $(this).addClass('hidden');
+      }
+    });
+    
+    // Show/hide content
+    $('#content-dashboard').toggleClass('hidden', page !== 'dashboard');
+    $('#content-applications').toggleClass('hidden', page !== 'applications');
+    $('#content-payments').toggleClass('hidden', page !== 'payments');
+    $('#content-subscriptions').toggleClass('hidden', page !== 'subscriptions');
+    
+    // Load data if needed
+    if (page === 'dashboard') {
+      loadDashboard();
+    } else if (page === 'payments') {
+      const appFilter = $('#payment-app-filter option').length;
+      if (appFilter <= 1) loadApplicationsForFilters();
+      loadPayments();
+    } else if (page === 'subscriptions') {
+      const appFilter = $('#subscription-app-filter option').length;
+      if (appFilter <= 1) loadApplicationsForFilters();
+      loadSubscriptions();
+    }
+  }
+
+  // Navigation click handlers
+  $(document).on('click', '.nav-tab', function() {
+    const page = $(this).data('page');
+    navigateToPage(page);
+  });
+
+  // Login Form
+  $('#login-form').on('submit', function (e) {
+    e.preventDefault();
+    const username = $('#username').val();
+    const password = $('#password').val();
+
+    $.ajax({
+      url: API_BASE + '/login',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ username, password }),
+      success: function (res) {
+        jwtToken = res.token;
+        localStorage.setItem('admin_token', jwtToken);
+        showDashboard();
+      },
+      error: function () {
+        $('#login-error')
+          .text('Invalid username or password')
+          .removeClass('hidden');
+      },
+    });
+  });
+
+  // Logout
+  $('#logout-btn').on('click', async function () {
+    const result = await Dialog.confirm({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      danger: true
+    });
+    if (result) {
+      localStorage.removeItem('admin_token');
+      jwtToken = null;
+      showLogin();
+    }
+  });
+
+  // Load Applications
+  function loadApplications() {
+    $.ajax({
+      url: API_BASE + '/admin/applications',
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (res) {
+        renderApps(res.data);
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load applications'
+        });
+      },
+    });
+  }
+
+  // Render Applications Table
+  function renderApps(apps) {
+    const tbody = $('#apps-table-body');
+    const emptyState = $('#empty-state');
+    
+    tbody.empty();
+    
+    if (apps.length === 0) {
+      emptyState.removeClass('hidden');
+      return;
+    }
+    
+    emptyState.addClass('hidden');
+    
+    apps.forEach((app) => {
+      const isActive = app.isActive;
+      tbody.append(`
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4">
+            <div class="font-medium text-slate-800">${app.name}</div>
+          </td>
+          <td class="px-6 py-4">
+            <code class="text-sm bg-slate-100 px-2 py-1 rounded text-slate-600 font-mono">${app.apiKey || '-'}</code>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-sm text-slate-500">${app.webhookUrl || '<span class="text-slate-400">-</span>'}</span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-sm text-slate-500">${app.subscriptionWebhookUrl || '<span class="text-slate-400">-</span>'}</span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+              <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}"></span>
+              ${isActive ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-500">
+            ${new Date(app.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-2">
+              <button class="edit-btn p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" data-id="${app.id}" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button class="delete-btn p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" data-id="${app.id}" title="Delete">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `);
+    });
+  }
+
+  // Add Application Button
+  $('#add-app-btn').on('click', function () {
+    $('#form-title').text('Add Application');
+    $('#app-id').val('');
+    $('#app-name').val('');
+    $('#app-webhook').val('');
+    $('#app-subscription-webhook').val('');
+    $('#app-active').val('true');
+    $('#active-container').addClass('hidden');
+    $('#app-form-container').removeClass('hidden');
+    $('#app-name').focus();
+  });
+
+  // Cancel Form
+  $('#cancel-form').on('click', function () {
+    $('#app-form-container').addClass('hidden');
+  });
+
+  // Edit Application
+  $(document).on('click', '.edit-btn', function () {
+    const id = $(this).data('id');
+    $.ajax({
+      url: API_BASE + '/admin/applications/' + id,
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (app) {
+        $('#form-title').text('Edit Application');
+        $('#app-id').val(app.id);
+        $('#app-name').val(app.name);
+        $('#app-webhook').val(app.webhookUrl || '');
+        $('#app-subscription-webhook').val(app.subscriptionWebhookUrl || '');
+        $('#app-active').val(app.isActive ? 'true' : 'false');
+        $('#active-container').removeClass('hidden');
+        $('#app-form-container').removeClass('hidden');
+        $('#app-name').focus();
+      },
+    });
+  });
+
+  // Delete Application
+  $(document).on('click', '.delete-btn', async function () {
+    const id = $(this).data('id');
+    const result = await Dialog.confirm({
+      title: 'Delete Application',
+      message: 'Are you sure you want to delete this application? This action cannot be undone.',
+      confirmText: 'Delete',
+      danger: true
+    });
+    
+    if (!result) return;
+    
+    $.ajax({
+      url: API_BASE + '/admin/applications/' + id,
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function () {
+        Dialog.alert({
+          type: 'success',
+          title: 'Deleted',
+          message: 'Application has been deleted successfully'
+        });
+        loadApplications();
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to delete application'
+        });
+      },
+    });
+  });
+
+  // Save Application
+  $('#app-form').on('submit', function (e) {
+    e.preventDefault();
+    const id = $('#app-id').val();
+    const data = {
+      name: $('#app-name').val(),
+      webhookUrl: $('#app-webhook').val() || undefined,
+      subscriptionWebhookUrl: $('#app-subscription-webhook').val() || undefined,
+    };
+
+    if (id) {
+      data.isActive = $('#app-active').val() === 'true';
+    }
+
+    const method = id ? 'POST' : 'POST';
+    const url = id
+      ? API_BASE + '/admin/applications/' + id
+      : API_BASE + '/admin/applications';
+
+    $.ajax({
+      url: url,
+      method: method,
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      data: JSON.stringify(data),
+      success: function () {
+        $('#app-form-container').addClass('hidden');
+        Dialog.alert({
+          type: 'success',
+          title: 'Saved',
+          message: id ? 'Application updated successfully' : 'Application created successfully'
+        });
+        loadApplications();
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to save application'
+        });
+      },
+    });
+  });
+
+  // Initial State
+  if (jwtToken) {
+    showDashboard();
+    navigateToPage('dashboard');
+  } else {
+    showLogin();
+  }
+
+  // Load Applications for Filter Dropdowns
+  function loadApplicationsForFilters() {
+    $.ajax({
+      url: API_BASE + '/admin/applications',
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (res) {
+        const apps = res.data;
+        const paymentSelect = $('#payment-app-filter');
+        const subscriptionSelect = $('#subscription-app-filter');
+        
+        paymentSelect.find('option:not(:first)').remove();
+        subscriptionSelect.find('option:not(:first)').remove();
+        
+        apps.forEach(app => {
+          paymentSelect.append(`<option value="${app.id}">${app.name}</option>`);
+          subscriptionSelect.append(`<option value="${app.id}">${app.name}</option>`);
+        });
+      },
+    });
+  }
+
+  // Load Payments
+  function loadPayments() {
+    const filteredParams = Object.fromEntries(
+      Object.entries(paymentFilters).filter(([_, v]) => v !== undefined)
+    );
+    const params = new URLSearchParams(filteredParams).toString();
+    $.ajax({
+      url: API_BASE + '/admin/payments?' + params,
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (res) {
+        renderPayments(res.data, res.meta);
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load payments'
+        });
+      },
+    });
+  }
+
+  // Render Payments Table
+  function renderPayments(payments, meta) {
+    const tbody = $('#payments-table-body');
+    const emptyState = $('#payments-empty-state');
+    const pagination = $('#payments-pagination');
+    
+    tbody.empty();
+    
+    if (payments.length === 0) {
+      emptyState.removeClass('hidden');
+      pagination.addClass('hidden');
+      return;
+    }
+    
+    emptyState.addClass('hidden');
+    pagination.removeClass('hidden');
+    
+    payments.forEach((payment) => {
+      const statusClass = {
+        'PENDING': 'bg-yellow-100 text-yellow-700',
+        'SUCCESS': 'bg-green-100 text-green-700',
+        'FAILED': 'bg-red-100 text-red-700',
+        'EXPIRED': 'bg-slate-100 text-slate-700'
+      }[payment.status] || 'bg-slate-100 text-slate-700';
+      
+      tbody.append(`
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-4">
+            <div class="text-sm font-medium text-slate-800">${payment.applicationOrderId || '-'}</div>
+            <div class="text-xs text-slate-500">${payment.externalId || '-'}</div>
+          </td>
+          <td class="px-4 py-4">
+            <div class="text-sm font-medium text-slate-800">${payment.amount.toLocaleString('id-ID', { style: 'currency', currency: payment.currency || 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+          </td>
+          <td class="px-4 py-4 text-sm text-slate-600">${payment.provider || '-'}</td>
+          <td class="px-4 py-4 text-sm text-slate-600">${payment.paymentMethod || '-'}</td>
+          <td class="px-4 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+              ${payment.status}
+            </span>
+          </td>
+          <td class="px-4 py-4 text-sm text-slate-500">${payment.customerEmail || '-'}</td>
+          <td class="px-4 py-4 text-sm text-slate-500">
+            ${new Date(payment.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </td>
+        </tr>
+      `);
+    });
+    
+    // Update pagination
+    const from = (meta.page - 1) * meta.limit + 1;
+    const to = Math.min(meta.page * meta.limit, meta.total);
+    $('#payments-from').text(meta.total > 0 ? from : 0);
+    $('#payments-to').text(to);
+    $('#payments-total').text(meta.total);
+    
+    $('#payments-prev').prop('disabled', meta.page <= 1);
+    $('#payments-next').prop('disabled', meta.page >= meta.totalPages);
+  }
+
+  // Payment Filters
+  $('#apply-payment-filters').on('click', function() {
+    paymentFilters.page = 1;
+    paymentFilters.applicationId = $('#payment-app-filter').val() || undefined;
+    paymentFilters.status = $('#payment-status-filter').val() || undefined;
+    paymentFilters.startDate = $('#payment-start-date').val() || undefined;
+    paymentFilters.endDate = $('#payment-end-date').val() || undefined;
+    loadPayments();
+  });
+
+  $('#reset-payment-filters').on('click', function() {
+    $('#payment-app-filter').val('');
+    $('#payment-status-filter').val('');
+    $('#payment-start-date').val('');
+    $('#payment-end-date').val('');
+    paymentFilters = { page: 1, limit: 10 };
+    loadPayments();
+  });
+
+  $('#payments-prev').on('click', function() {
+    if (paymentFilters.page > 1) {
+      paymentFilters.page--;
+      loadPayments();
+    }
+  });
+
+  $('#payments-next').on('click', function() {
+    paymentFilters.page++;
+    loadPayments();
+  });
+
+  // Load Subscriptions
+  function loadSubscriptions() {
+    const filteredParams = Object.fromEntries(
+      Object.entries(subscriptionFilters).filter(([_, v]) => v !== undefined)
+    );
+    const params = new URLSearchParams(filteredParams).toString();
+    $.ajax({
+      url: API_BASE + '/admin/subscriptions?' + params,
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (res) {
+        renderSubscriptions(res.data, res.meta);
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load subscriptions'
+        });
+      },
+    });
+  }
+
+  // Render Subscriptions Table
+  function renderSubscriptions(subscriptions, meta) {
+    const tbody = $('#subscriptions-table-body');
+    const emptyState = $('#subscriptions-empty-state');
+    const pagination = $('#subscriptions-pagination');
+    
+    tbody.empty();
+    
+    if (subscriptions.length === 0) {
+      emptyState.removeClass('hidden');
+      pagination.addClass('hidden');
+      return;
+    }
+    
+    emptyState.addClass('hidden');
+    pagination.removeClass('hidden');
+    
+    subscriptions.forEach((sub) => {
+      const statusClass = {
+        'ACTIVE': 'bg-green-100 text-green-700',
+        'PAUSED': 'bg-yellow-100 text-yellow-700',
+        'CANCELLED': 'bg-red-100 text-red-700',
+        'EXPIRED': 'bg-slate-100 text-slate-700',
+        'FAILED': 'bg-red-100 text-red-700'
+      }[sub.status] || 'bg-slate-100 text-slate-700';
+      
+      const nextBilling = sub.nextBillingDate 
+        ? new Date(sub.nextBillingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+        : '-';
+      
+      tbody.append(`
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-4">
+            <div class="text-sm font-medium text-slate-800">${sub.applicationSubscriptionId || '-'}</div>
+            <div class="text-xs text-slate-500">${sub.externalSubscriptionId || '-'}</div>
+          </td>
+          <td class="px-4 py-4">
+            <div class="text-sm font-medium text-slate-800">${sub.amount.toLocaleString('id-ID', { style: 'currency', currency: sub.currency || 'IDR' })}</div>
+          </td>
+          <td class="px-4 py-4 text-sm text-slate-600">${sub.billingCycle || '-'}</td>
+          <td class="px-4 py-4 text-sm text-slate-600">${sub.provider || '-'}</td>
+          <td class="px-4 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+              ${sub.status}
+            </span>
+          </td>
+          <td class="px-4 py-4 text-sm text-slate-500">${nextBilling}</td>
+          <td class="px-4 py-4 text-sm text-slate-500">
+            ${new Date(sub.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </td>
+        </tr>
+      `);
+    });
+    
+    // Update pagination
+    const from = (meta.page - 1) * meta.limit + 1;
+    const to = Math.min(meta.page * meta.limit, meta.total);
+    $('#subscriptions-from').text(meta.total > 0 ? from : 0);
+    $('#subscriptions-to').text(to);
+    $('#subscriptions-total').text(meta.total);
+    
+    $('#subscriptions-prev').prop('disabled', meta.page <= 1);
+    $('#subscriptions-next').prop('disabled', meta.page >= meta.totalPages);
+  }
+
+  // Subscription Filters
+  $('#apply-subscription-filters').on('click', function() {
+    subscriptionFilters.page = 1;
+    subscriptionFilters.applicationId = $('#subscription-app-filter').val() || undefined;
+    subscriptionFilters.status = $('#subscription-status-filter').val() || undefined;
+    subscriptionFilters.startDate = $('#subscription-start-date').val() || undefined;
+    subscriptionFilters.endDate = $('#subscription-end-date').val() || undefined;
+    loadSubscriptions();
+  });
+
+  $('#reset-subscription-filters').on('click', function() {
+    $('#subscription-app-filter').val('');
+    $('#subscription-status-filter').val('');
+    $('#subscription-start-date').val('');
+    $('#subscription-end-date').val('');
+    subscriptionFilters = { page: 1, limit: 10 };
+    loadSubscriptions();
+  });
+
+  $('#subscriptions-prev').on('click', function() {
+    if (subscriptionFilters.page > 1) {
+      subscriptionFilters.page--;
+      loadSubscriptions();
+    }
+  });
+
+  $('#subscriptions-next').on('click', function() {
+    subscriptionFilters.page++;
+    loadSubscriptions();
+  });
+
+  // Dashboard Functions
+  function loadDashboard() {
+    $.ajax({
+      url: API_BASE + '/admin/dashboard',
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + jwtToken },
+      success: function (data) {
+        renderDashboard(data);
+      },
+      error: function () {
+        Dialog.alert({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load dashboard data'
+        });
+      },
+    });
+  }
+
+  function renderDashboard(data) {
+    // Applications
+    $('#dash-total-apps').text(data.applications.total);
+    $('#dash-active-apps').text(data.applications.active);
+    $('#dash-inactive-apps').text(data.applications.inactive);
+
+    // Payments
+    $('#dash-total-payments').text(data.payments.total);
+    $('#dash-success-payments').text(data.payments.success);
+    $('#dash-failed-payments').text(data.payments.failed);
+    $('#dash-pending-payments').text(data.payments.pending);
+    $('#dash-payment-success').text(data.payments.success);
+    $('#dash-payment-failed').text(data.payments.failed);
+    $('#dash-payment-expired').text(data.payments.expired);
+
+    // Subscriptions
+    $('#dash-total-subs').text(data.subscriptions.total);
+    $('#dash-active-subs').text(data.subscriptions.active);
+    $('#dash-cancelled-subs').text(data.subscriptions.cancelled);
+    $('#dash-sub-active').text(data.subscriptions.active);
+    $('#dash-sub-paused').text(data.subscriptions.paused);
+    $('#dash-sub-cancelled').text(data.subscriptions.cancelled);
+    $('#dash-sub-expired').text(data.subscriptions.expired);
+
+    // Volume
+    const totalVolume = data.transactions.totalVolume;
+    $('#dash-total-volume').text(formatCurrency(totalVolume));
+    $('#dash-success-rate').text(data.transactions.successRate);
+
+    // Daily Trend Chart
+    renderTrendChart(data.transactions.dailyTrend);
+
+    // Recent Activity
+    renderRecentActivity(data.recentActivity);
+  }
+
+  function formatCurrency(amount) {
+    if (amount >= 1000000000) {
+      return 'Rp ' + (amount / 1000000000).toFixed(1) + 'B';
+    } else if (amount >= 1000000) {
+      return 'Rp ' + (amount / 1000000).toFixed(1) + 'M';
+    } else if (amount >= 1000) {
+      return 'Rp ' + (amount / 1000).toFixed(1) + 'K';
+    }
+    return 'Rp ' + amount.toLocaleString('id-ID');
+  }
+
+  function renderTrendChart(dailyTrend) {
+    const chartContainer = $('#trend-chart');
+    chartContainer.empty();
+
+    if (!dailyTrend || dailyTrend.length === 0) {
+      chartContainer.html('<div class="w-full text-center text-slate-400 py-20">No data available</div>');
+      return;
+    }
+
+    const maxAmount = Math.max(...dailyTrend.map(d => d.amount), 1);
+
+    dailyTrend.forEach((day) => {
+      const heightPercent = (day.amount / maxAmount) * 100;
+      const totalTransactions = day.payments + day.subscriptions;
+      const barClass = totalTransactions > 0 ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-200 hover:bg-slate-300';
+      
+      const date = new Date(day.date);
+      const dayLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      chartContainer.append(`
+        <div class="flex-1 flex flex-col items-center group cursor-pointer">
+          <div class="w-full relative" style="height: 240px;">
+            <div class="absolute bottom-0 w-full ${barClass} rounded-t transition-all duration-200 group-hover:opacity-80" style="height: ${Math.max(heightPercent, 2)}%;" title="${dayLabel}: ${totalTransactions} transactions, ${formatCurrency(day.amount)}"></div>
+          </div>
+          ${day.date.endsWith('-01') || day.date.endsWith('-15') ? `<span class="text-xs text-slate-500 transform -rotate-45 origin-top-left whitespace-nowrap">${dayLabel}</span>` : ''}
+        </div>
+      `);
+    });
+  }
+
+  function renderRecentActivity(activities) {
+    const container = $('#recent-activity');
+    container.empty();
+
+    if (!activities || activities.length === 0) {
+      container.html('<div class="px-6 py-8 text-center text-slate-400">No recent activity</div>');
+      return;
+    }
+
+    activities.forEach((activity) => {
+      const iconClass = {
+        'payment': 'bg-emerald-100 text-emerald-600',
+        'subscription': 'bg-purple-100 text-purple-600',
+        'application': 'bg-blue-100 text-blue-600'
+      }[activity.type] || 'bg-slate-100 text-slate-600';
+
+      const icon = {
+        'payment': '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+        'subscription': '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>',
+        'application': '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>'
+      }[activity.type] || '';
+
+      container.append(`
+        <div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+          <div class="w-8 h-8 rounded-full ${iconClass} flex items-center justify-center flex-shrink-0">
+            ${icon}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-slate-800">${activity.action}</div>
+            <div class="text-xs text-slate-500 truncate">${activity.description}</div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            ${activity.amount ? `<div class="text-sm font-medium text-slate-800">${formatCurrency(activity.amount)}</div>` : ''}
+            <div class="text-xs text-slate-500">${new Date(activity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        </div>
+      `);
+    });
+  }
+</script>
